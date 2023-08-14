@@ -5,7 +5,7 @@ mutation_rate = 1
 genome_length = 9
 priority_length = 5
 cell_type_length = 4
-population_size = 100
+population_size = 20
 
 cell_coordinates = {}
 cell_data = {}
@@ -20,12 +20,12 @@ def cells_coord():
     return cell_coordinates
 def cells_data():
     return cell_data
-def update_coordinates(cell):
+def update_coordinates(parent_cell, child_cell):
     try:
         print('keepalive')
-        x, y = cell_coordinates[tuple(cell)]
-        best_prioritet = max(cell[:5])
-        index = cell.index(best_prioritet)
+        x, y = cell_coordinates[tuple(parent_cell)]
+        best_prioritet = max(parent_cell[:5])
+        index = parent_cell.index(best_prioritet)
 
         if index == 0:  # Stay in the same place
             ox,oy = (x,y)
@@ -74,7 +74,7 @@ def update_coordinates(cell):
             elif(oy < 0):
                 oy = 0
         
-        cell_coordinates[tuple(cell)] = (ox, oy)
+        cell_coordinates[tuple(child_cell)] = (ox, oy)
         return (ox, oy)
     
     except Exception:
@@ -117,7 +117,7 @@ def check_hp_cells():
             cell_coordinates.pop(tuple(cell))
             population.pop(population.index(cell))
 
-def initialize_population(pop_size, genome_len):
+def initialize_population(pop_size):
     print('keepalive')
     population = []
     for _ in range(pop_size):
@@ -130,16 +130,15 @@ def initialize_population(pop_size, genome_len):
     return population
 
 def create_cell(base_cell):
-    if(cell_data[tuple(base_cell)][1] >= 10):
+    if(cell_data[tuple(base_cell)][1] >= 10 and cell_data[tuple(base_cell)][2] == 1):
         cell_data[tuple(base_cell)][1] -= 10
         type = max(base_cell[5:])
-        cell_data[tuple(base_cell)][2] = type
         new_cell = base_cell[:5] + [random.randint(0, 4) for _ in range(cell_type_length)]
         population.append(new_cell)
-        cell_coordinates.update({tuple(new_cell) : cell_coordinates[tuple(base_cell)]})
         cell_data.update({tuple(new_cell) : cell_data[tuple(base_cell)]})
+        cell_data[tuple(new_cell)][2] = type
         sleep(0.2)
-        update_coordinates(new_cell)
+        update_coordinates(base_cell, new_cell)
 
 def mutate(genome):
     print('keepalive')
@@ -179,7 +178,7 @@ def select_parents(population, num_parents):
 def genetic_algorithm():
     print('keepalive')
     global population
-    population = initialize_population(population_size, genome_length)
+    population = initialize_population(population_size)
     best_genome = None
     best_fitness = float('-inf')
     while True:
