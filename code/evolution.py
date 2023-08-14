@@ -69,6 +69,7 @@ def update_coordinates(cell):
                 oy = __COLS
             elif(oy < 0):
                 oy = 0
+        
         cell_coordinates[tuple(cell)] = (ox, oy)
     except Exception:
         print(Exception)
@@ -96,16 +97,16 @@ def calculate_health_parameter(cell):
         if(cell_data[tuple(cell)][1] != 100): cell_data[tuple(cell)][1] += 10
         return 2
     else:
-        if(cell_data[tuple(cell)][0] >= 0): 
+        if(cell_data[tuple(cell)][0] > 0): 
             cell_data[tuple(cell)][0] -= 10
-        if(cell_data[tuple(cell)][1] >= 0): 
+        if(cell_data[tuple(cell)][1] > 0): 
             cell_data[tuple(cell)][1] -= 20
         return -1
 
 def check_hp_cells():
     print('keepalive')
     for cell in population:
-        if (cell_data[tuple(cell)][0] == 0):
+        if (cell_data[tuple(cell)][0] <= 0):
             cell_data.pop(tuple(cell))
             cell_coordinates.pop(tuple(cell))
             population.pop(population.index(cell))
@@ -118,11 +119,13 @@ def initialize_population(pop_size, genome_len):
         x = random.randint(0, __ROWS)
         y = random.randint(0, __COLS)
         cell_coordinates[tuple(genome)] = (x, y)
-        cell_data[tuple(genome)] = [100, 100, 1] # 0 - количество здоровья, 1 - количество энергии, 2 - тип клетки (всего их пока 5. 0 - стебли соединения, 1 - основа, 2 - лист, 3 - корень, 4 - антенна)
+        cell_data[tuple(genome)] = [100, 0, 1] # 0 - количество здоровья, 1 - количество энергии, 2 - тип клетки (всего их пока 5. 0 - стебли соединения, 1 - основа, 2 - лист, 3 - корень, 4 - антенна)
         population.append(genome)
     return population
 
 def create_cell(base_cell, population, type, direction):
+    type = base_cell[4:]
+
     population.append()
 
 def mutate(genome):
@@ -134,6 +137,7 @@ def mutate(genome):
     cell_data.update({tuple(mutated_genome) : cell_data[tuple(genome)]})
     cell_data.pop(tuple(genome))
     cell_coordinates.pop(tuple(genome), None)
+    sleep(0.2)
     return mutated_genome
 
 def crossover(parent1, parent2):

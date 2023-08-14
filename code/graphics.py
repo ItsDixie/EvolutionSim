@@ -6,6 +6,8 @@ import threading
 
 pygame.init()
 
+writeCells = False
+
 CELL_SIZE = 10
 ROWS = 100
 COLS = 100
@@ -32,7 +34,7 @@ def draw_filled_circle(x, y, radius, color):
 parse_cells()
 
 genetic_thread = threading.Thread(target=evolution.genetic_algorithm, name="GeneticALg")
-genetic_thread.daemon = True
+
 genetic_thread.start()
 
 
@@ -46,9 +48,11 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             get_pos()
     screen.fill(WHITE)
-    for row in range(ROWS):
-        for col in range(COLS):
-            pygame.draw.rect(screen, BLACK, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 1)
+
+    if writeCells :
+        for row in range(ROWS):
+            for col in range(COLS):
+                pygame.draw.rect(screen, BLACK, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 1)
             
     for cell in coords:
         draw_filled_circle(coords[cell][0], coords[cell][1], 5, (255, 0, 0))
