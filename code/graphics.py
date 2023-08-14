@@ -17,7 +17,6 @@ screen = pygame.display.set_mode(WINDOW_SIZE)
 pygame.display.set_caption("Clickable 2D Canvas")
 
 cell_parameters = {}
-circles = {}
 
 evolution.import_from_canvas(CELL_SIZE, ROWS, COLS, cell_parameters)
 def parse_cells():
@@ -25,7 +24,7 @@ def parse_cells():
         for col in range(COLS):
             row = int(row)
             col = int(col)
-            cell_parameters[(row, col)] = [randint(30, 100), randint(5, 100)]
+            cell_parameters[(row, col)] = [randint(10, 30), randint(20, 50)]
 
 def draw_filled_circle(x, y, radius, color):
     pygame.draw.circle(screen, color, (x * CELL_SIZE + CELL_SIZE // 2, y * CELL_SIZE + CELL_SIZE // 2), radius)          
@@ -54,10 +53,6 @@ while running:
     for cell in coords:
         draw_filled_circle(coords[cell][0], coords[cell][1], 5, (255, 0, 0))
 
-        circles[(coords[cell][0], coords[cell][1])] = None
-
-        if (coords[cell][0], coords[cell][1]) not in circles.keys():
-            draw_filled_circle(coords[cell][0], coords[cell][1], 5, (255, 255, 255))
     pygame.display.flip()
 
 

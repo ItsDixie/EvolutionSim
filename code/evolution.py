@@ -1,7 +1,7 @@
 import random
 from time import sleep
 num_generations = 50
-mutation_rate = 0.5  
+mutation_rate = 1  
 genome_length = 9
 priority_length = 5
 cell_type_length = 4
@@ -88,16 +88,18 @@ def calculate_health_parameter(cell):
     alive_x = int(cell_coordinates[tuple(cell)][0])
     alive_y = int(cell_coordinates[tuple(cell)][1])
     if(alive_x == __ROWS or alive_y == __COLS):
-        if(cell_data[tuple(cell)][0] <= 0): cell_data[tuple(cell)][0] = 0
+        if(cell_data[tuple(cell)][0] > 0): cell_data[tuple(cell)][0] = 0
         check_hp_cells()
         return -2
-    elif (__PARAMS[(alive_x, alive_y)][0] <= 40 and __PARAMS[(alive_x, alive_y)][1] >= 30):
+    elif (__PARAMS[(alive_x, alive_y)][0] <= 40 and __PARAMS[(alive_x, alive_y)][1] <= 30):
         if(cell_data[tuple(cell)][0] != 100): cell_data[tuple(cell)][0] += 5
         if(cell_data[tuple(cell)][1] != 100): cell_data[tuple(cell)][1] += 10
         return 2
     else:
-        if(cell_data[tuple(cell)][0] <= 0): cell_data[tuple(cell)][0] -= 10
-        if(cell_data[tuple(cell)][1] <= 0): cell_data[tuple(cell)][1] -= 20
+        if(cell_data[tuple(cell)][0] >= 0): 
+            cell_data[tuple(cell)][0] -= 10
+        if(cell_data[tuple(cell)][1] >= 0): 
+            cell_data[tuple(cell)][1] -= 20
         return -1
 
 def check_hp_cells():
@@ -129,6 +131,8 @@ def mutate(genome):
     for i in range(priority_length, priority_length + 4):
         mutated_genome[i] = random.randint(0, 9)
     cell_coordinates.update({tuple(mutated_genome) : cell_coordinates[tuple(genome)]})
+    cell_data.update({tuple(mutated_genome) : cell_data[tuple(genome)]})
+    cell_data.pop(tuple(genome))
     cell_coordinates.pop(tuple(genome), None)
     return mutated_genome
 
@@ -163,11 +167,12 @@ def genetic_algorithm():
     best_fitness = float('-inf')
     while True:
 
-        '''if(random.random() < mutation_rate):
+        if(random.random() < mutation_rate):
             rng = random.randint(0, len(population)-1)
             mutated = mutate(population[rng])
             population.append(mutated)
             population.pop(rng)
+        '''    
         p1,p2 = select_parents(population, 2)           # fix keyerror bug
         child1, child2 = crossover(p1, p2)
         population.append(child1)
