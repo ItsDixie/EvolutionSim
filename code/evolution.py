@@ -29,6 +29,7 @@ def update_coordinates(cell):
 
         if index == 0:  # Stay in the same place
             ox,oy = (x,y)
+
         elif index == 1:  # Move up
             ox,oy = (x, y+1)
             if(ox > __ROWS):
@@ -39,6 +40,7 @@ def update_coordinates(cell):
                 oy = __COLS
             elif(oy < 0):
                 oy = 0
+
         elif index == 2:  # Move left
             ox,oy = (x-1, y)
             if(ox > __ROWS):
@@ -49,6 +51,7 @@ def update_coordinates(cell):
                 oy = __COLS
             elif(oy < 0):
                 oy = 0
+
         elif index == 3:  # Move right
             ox,oy = (x+1, y)
             if(ox > __ROWS):
@@ -59,6 +62,7 @@ def update_coordinates(cell):
                 oy = __COLS
             elif(oy < 0):
                 oy = 0
+
         elif index == 4:  # Move down
             ox,oy = (x, y-1)
             if(ox > __ROWS):
@@ -71,12 +75,14 @@ def update_coordinates(cell):
                 oy = 0
         
         cell_coordinates[tuple(cell)] = (ox, oy)
+        return (ox, oy)
+    
     except Exception:
         print(Exception)
 
 def fitness_function(cell):
     print('keepalive')
-    update_coordinates(cell)
+    create_cell(cell)
     overall_fitness = cell_data[tuple(cell)][0] + cell_data[tuple(cell)][1]
     health_param = calculate_health_parameter(cell)
     overall_fitness *= health_param
@@ -115,18 +121,25 @@ def initialize_population(pop_size, genome_len):
     print('keepalive')
     population = []
     for _ in range(pop_size):
-        genome = [random.randint(0, 9) for _ in range(genome_len)]
+        genome = [random.randint(0, 9) for _ in range(priority_length)] + [random.randint(0, 4) for _ in range(cell_type_length)]
         x = random.randint(0, __ROWS)
         y = random.randint(0, __COLS)
         cell_coordinates[tuple(genome)] = (x, y)
-        cell_data[tuple(genome)] = [100, 0, 1] # 0 - количество здоровья, 1 - количество энергии, 2 - тип клетки (всего их пока 5. 0 - стебли соединения, 1 - основа, 2 - лист, 3 - корень, 4 - антенна)
+        cell_data[tuple(genome)] = [100, 50, 1] # 0 - количество здоровья, 1 - количество энергии, 2 - тип клетки (всего их пока 5. 0 - стебли соединения, 1 - основа, 2 - лист, 3 - корень, 4 - антенна)
         population.append(genome)
     return population
 
-def create_cell(base_cell, population, type, direction):
-    type = base_cell[4:]
-
-    population.append()
+def create_cell(base_cell):
+    if(cell_data[tuple(base_cell)][1] >= 10):
+        cell_data[tuple(base_cell)][1] -= 10
+        type = max(base_cell[5:])
+        cell_data[tuple(base_cell)][2] = type
+        new_cell = base_cell[:5] + [random.randint(0, 4) for _ in range(cell_type_length)]
+        population.append(new_cell)
+        cell_coordinates.update({tuple(new_cell) : cell_coordinates[tuple(base_cell)]})
+        cell_data.update({tuple(new_cell) : cell_data[tuple(base_cell)]})
+        sleep(0.2)
+        update_coordinates(new_cell)
 
 def mutate(genome):
     print('keepalive')

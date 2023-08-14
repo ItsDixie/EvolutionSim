@@ -26,7 +26,7 @@ def parse_cells():
         for col in range(COLS):
             row = int(row)
             col = int(col)
-            cell_parameters[(row, col)] = [randint(10, 30), randint(20, 50)]
+            cell_parameters[(row, col)] = [randint(0, 0), randint(0, 0)]
 
 def draw_filled_circle(x, y, radius, color):
     pygame.draw.circle(screen, color, (x * CELL_SIZE + CELL_SIZE // 2, y * CELL_SIZE + CELL_SIZE // 2), radius)          
@@ -58,6 +58,12 @@ while running:
     for cell in coords:
         if(data[tuple(cell)][2] == 1):
             draw_filled_circle(coords[cell][0], coords[cell][1], 5, (47,79,79))
+        elif(data[tuple(cell)][2] == 2):
+            draw_filled_circle(coords[cell][0], coords[cell][1], 5, (120,100,10))
+        elif(data[tuple(cell)][2] == 3):
+            draw_filled_circle(coords[cell][0], coords[cell][1], 5, (102,51,0))
+        elif(data[tuple(cell)][2] == 4):
+            draw_filled_circle(coords[cell][0], coords[cell][1], 5, (240,80,100))
 
     pygame.display.flip()
 
