@@ -42,6 +42,7 @@ running = True
 
 while running:
     coords = evolution.cells_coord()
+    data = evolution.cells_data()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -55,7 +56,8 @@ while running:
                 pygame.draw.rect(screen, BLACK, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 1)
             
     for cell in coords:
-        draw_filled_circle(coords[cell][0], coords[cell][1], 5, (255, 0, 0))
+        if(data[tuple(cell)][2] == 1):
+            draw_filled_circle(coords[cell][0], coords[cell][1], 5, (47,79,79))
 
     pygame.display.flip()
 
