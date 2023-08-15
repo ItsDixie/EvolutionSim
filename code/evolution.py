@@ -1,11 +1,13 @@
 import random
-from time import sleep
+
+base_hp, base_energy = 100, 50
+
 num_generations = 50
 mutation_rate = 1  
 genome_length = 9
 priority_length = 5
 cell_type_length = 4
-population_size = 50
+population_size = 500
 
 cell_coordinates = {}
 cell_data = {}
@@ -27,11 +29,15 @@ def update_coordinates(parent_cell, child_cell):
         best_prioritet = max(parent_cell[:5])
         index = parent_cell.index(best_prioritet)
 
+        if(cell_data[tuple(child_cell)][2] == 5):
+            mult = best_prioritet // 2
+        else:
+            mult = 1
         if index == 0:  # Stay in the same place
             ox,oy = (x,y)
 
         elif index == 1:  # Move up
-            ox,oy = (x, y+1)
+            ox,oy = (x, y+mult)
             if(ox > __ROWS):
                 ox = __ROWS
             elif(ox < 0):
@@ -42,7 +48,7 @@ def update_coordinates(parent_cell, child_cell):
                 oy = 0
 
         elif index == 2:  # Move left
-            ox,oy = (x-1, y)
+            ox,oy = (x-mult, y)
             if(ox > __ROWS):
                 ox = __ROWS
             elif(ox < 0):
@@ -53,7 +59,7 @@ def update_coordinates(parent_cell, child_cell):
                 oy = 0
 
         elif index == 3:  # Move right
-            ox,oy = (x+1, y)
+            ox,oy = (x+mult, y)
             if(ox > __ROWS):
                 ox = __ROWS
             elif(ox < 0):
@@ -64,7 +70,7 @@ def update_coordinates(parent_cell, child_cell):
                 oy = 0
 
         elif index == 4:  # Move down
-            ox,oy = (x, y-1)
+            ox,oy = (x, y-mult)
             if(ox > __ROWS):
                 ox = __ROWS
             elif(ox < 0):
@@ -159,23 +165,27 @@ def initialize_population(pop_size):
     print('keepalive')
     population = []
     for _ in range(pop_size):
-        genome = [random.randint(0, 9) for _ in range(priority_length)] + [random.randint(0, 4) for _ in range(cell_type_length)]
+        genome = [random.randint(0, 9) for _ in range(priority_length)] + [random.randint(0, 5) for _ in range(cell_type_length)]
         x = random.randint(0, __ROWS)
         y = random.randint(0, __COLS)
         cell_coordinates[tuple(genome)] = (x, y)
-        cell_data[tuple(genome)] = [100, 50, 1] # 0 - количество здоровья, 1 - количество энергии, 2 - тип клетки (всего их пока 5. 0 - стебли соединения, 1 - основа, 2 - лист, 3 - корень, 4 - антенна)
+        cell_data[tuple(genome)] = [base_hp, base_energy, 1] # 0 - количество здоровья, 1 - количество энергии, 2 - тип клетки (всего их пока 5. 0 - стебли соединения, 1 - основа, 2 - лист, 3 - корень, 4 - антенна, 5 - семя)
         population.append(genome)
     return population
 
 def create_cell(base_cell):
-    if(cell_data[tuple(base_cell)][1] >= 10 and cell_data[tuple(base_cell)][2] == 1):
+    type = max(base_cell[5:])
+    if(cell_data[tuple(base_cell)][1] >= 10 and cell_data[tuple(base_cell)][2] == 1 or cell_data[tuple(base_cell)][2] == 5):
         cell_data[tuple(base_cell)][1] -= 10
-        type = max(base_cell[5:])
         copy = base_cell.copy()
         index_to_change = random.randint(4, len(base_cell) - 1)
-        new_value = random.randint(0, 4)
+        new_value = random.randint(0, 5)
         copy[index_to_change] = new_value
         new_cell = base_cell[:5] + copy[5:]
+        updateDicts(base_cell, False, new_cell, type)
+    elif(cell_data[tuple(base_cell)][1] >= 50 and type == 5):
+        cell_data[tuple(base_cell)][1] -= 50
+        new_cell = base_cell
         updateDicts(base_cell, False, new_cell, type)
         
 
@@ -183,7 +193,7 @@ def mutate(genome):
     print('keepalive')
     mutated_genome = genome.copy()
     index_to_change = random.randint(0, len(mutated_genome) - 1)
-    new_value = random.randint(0, 9) if index_to_change <= 4 else random.randint(0, 4)
+    new_value = random.randint(0, 9) if index_to_change <= 4 else random.randint(0, 5)
     mutated_genome[index_to_change] = new_value
     updateDicts(genome, True, mutated_genome)
     return mutated_genome

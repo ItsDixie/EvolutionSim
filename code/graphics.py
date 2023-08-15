@@ -3,6 +3,7 @@ import sys
 from random import randint
 import evolution
 import threading
+from time import sleep
 
 pygame.init()
 
@@ -26,7 +27,7 @@ def parse_cells():
         for col in range(COLS):
             row = int(row)
             col = int(col)
-            cell_parameters[(row, col)] = [randint(100, 100), randint(0, 10)]
+            cell_parameters[(row, col)] = [randint(0, 100), randint(0, 100)]
 
 def draw_filled_circle(x, y, radius, color):
     pygame.draw.circle(screen, color, (x * CELL_SIZE + CELL_SIZE // 2, y * CELL_SIZE + CELL_SIZE // 2), radius)          
