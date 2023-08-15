@@ -55,17 +55,20 @@ while running:
         for row in range(ROWS):
             for col in range(COLS):
                 pygame.draw.rect(screen, BLACK, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 1)
-            
-    for cell in coords:
-        if(data[tuple(cell)][2] == 1):
-            draw_filled_circle(coords[cell][0], coords[cell][1], 5, (255,0,0))
-        elif(data[tuple(cell)][2] == 2):
-            draw_filled_circle(coords[cell][0], coords[cell][1], 5, (120,100,10))
-        elif(data[tuple(cell)][2] == 3):
-            draw_filled_circle(coords[cell][0], coords[cell][1], 5, (102,51,0))
-        elif(data[tuple(cell)][2] == 4):
-            draw_filled_circle(coords[cell][0], coords[cell][1], 5, (240,80,100))
-
+    try:
+        for cell in coords:
+            if(data[tuple(cell)][2] == 1):
+                draw_filled_circle(coords[cell][0], coords[cell][1], 5, (255,0,0))
+            elif(data[tuple(cell)][2] == 2):
+                draw_filled_circle(coords[cell][0], coords[cell][1], 5, (120,100,10))
+            elif(data[tuple(cell)][2] == 3):
+                draw_filled_circle(coords[cell][0], coords[cell][1], 5, (102,51,0))
+            elif(data[tuple(cell)][2] == 4):
+                draw_filled_circle(coords[cell][0], coords[cell][1], 5, (240,80,100))
+            elif(data[tuple(cell)][2] == 5):
+                draw_filled_circle(coords[cell][0], coords[cell][1], 5, (255,165,0))
+    except Exception: 
+        pass
     pygame.display.flip()
 
 
