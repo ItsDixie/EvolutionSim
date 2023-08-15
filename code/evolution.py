@@ -5,12 +5,13 @@ base_hp, base_energy = 100, 50
 num_generations = 50
 mutation_rate = 1  
 genome_length = 9
-priority_length = 5
+priority_length = 4
 cell_type_length = 4
-population_size = 500
+population_size = 1000
 
 cell_coordinates = {}
 cell_data = {}
+
 def import_from_canvas(size, rows, cols, params):
     global __SIZE, __ROWS, __COLS, __PARAMS
     __SIZE = size
@@ -26,17 +27,15 @@ def update_coordinates(parent_cell, child_cell):
     try:
         print('keepalive')
         x, y = cell_coordinates[tuple(parent_cell)]
-        best_prioritet = max(parent_cell[:5])
+        best_prioritet = max(parent_cell[:4])
         index = parent_cell.index(best_prioritet)
 
         if(cell_data[tuple(child_cell)][2] == 5):
             mult = best_prioritet // 2
         else:
             mult = 1
-        if index == 0:  # Stay in the same place
-            ox,oy = (x,y)
 
-        elif index == 1:  # Move up
+        if index == 0:  # Move up
             ox,oy = (x, y+mult)
             if(ox > __ROWS):
                 ox = __ROWS
@@ -47,7 +46,7 @@ def update_coordinates(parent_cell, child_cell):
             elif(oy < 0):
                 oy = 0
 
-        elif index == 2:  # Move left
+        elif index == 1:  # Move left
             ox,oy = (x-mult, y)
             if(ox > __ROWS):
                 ox = __ROWS
@@ -58,7 +57,7 @@ def update_coordinates(parent_cell, child_cell):
             elif(oy < 0):
                 oy = 0
 
-        elif index == 3:  # Move right
+        elif index == 2:  # Move right
             ox,oy = (x+mult, y)
             if(ox > __ROWS):
                 ox = __ROWS
@@ -69,7 +68,7 @@ def update_coordinates(parent_cell, child_cell):
             elif(oy < 0):
                 oy = 0
 
-        elif index == 4:  # Move down
+        elif index == 3:  # Move down
             ox,oy = (x, y-mult)
             if(ox > __ROWS):
                 ox = __ROWS
@@ -112,6 +111,10 @@ def calculate_health_parameter(cell):
         if(cell_data[tuple(cell)][1] != 100): cell_data[tuple(cell)][1] += 10
         return 1
     else:
+        if(type == 2):
+            if(cell_data[tuple(cell)][1] != 100): cell_data[tuple(cell)][1] += 10
+            if(cell_data[tuple(cell)][0] != 100): cell_data[tuple(cell)][0] += 5
+            return 2
         if(organics >= 40 and energy <= 30 and type == 3):
             if(cell_data[tuple(cell)][1] != 100): cell_data[tuple(cell)][1] += 10
             return 2
@@ -174,19 +177,19 @@ def initialize_population(pop_size):
     return population
 
 def create_cell(base_cell):
-    type = max(base_cell[5:])
+    type = max(base_cell[4:])
     if(cell_data[tuple(base_cell)][1] >= 10 and cell_data[tuple(base_cell)][2] == 1 or cell_data[tuple(base_cell)][2] == 5):
         cell_data[tuple(base_cell)][1] -= 10
         copy = base_cell.copy()
         index_to_change = random.randint(4, len(base_cell) - 1)
         new_value = random.randint(0, 5)
         copy[index_to_change] = new_value
-        new_cell = base_cell[:5] + copy[5:]
+        new_cell = base_cell[:4] + copy[4:]
         updateDicts(base_cell, False, new_cell, type)
-    elif(cell_data[tuple(base_cell)][1] >= 50 and type == 5):
+    '''elif(cell_data[tuple(base_cell)][1] >= 50 and type == 5):
         cell_data[tuple(base_cell)][1] -= 50
         new_cell = base_cell
-        updateDicts(base_cell, False, new_cell, type)
+        updateDicts(base_cell, False, new_cell, type)'''
         
 
 def mutate(genome):
