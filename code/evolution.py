@@ -11,7 +11,8 @@ population_size = 1000
 
 cell_coordinates = {}
 cell_data = {}
-
+multi_cells = {}
+########################
 def import_from_canvas(size, rows, cols, params):
     global __SIZE, __ROWS, __COLS, __PARAMS
     __SIZE = size
@@ -23,6 +24,7 @@ def cells_coord():
     return cell_coordinates
 def cells_data():
     return cell_data
+########################
 def update_coordinates(parent_cell, child_cell):
     try:
         print('keepalive')
@@ -85,10 +87,19 @@ def update_coordinates(parent_cell, child_cell):
     except Exception:
         print(Exception)
 
+def parse_multi_cells(target_cell):
+    try: # if it fails, probably this cell is part of multi cell alrady
+        list_of_cells_data = multi_cells[tuple(target_cell)]
+        total_cell_hp = sum(cell_data[0] for cell_data in list_of_cells_data)
+    except Exception: # look how to get dict key knowing only one value, EVERYWHERE WHEN MULTI_CELSS CALLED!!!!
+        return 1
+
+    return total_cell_hp
+
 def fitness_function(cell):
     print('keepalive')
     create_cell(cell)
-    overall_fitness = cell_data[tuple(cell)][0] + cell_data[tuple(cell)][1]
+    overall_fitness = cell_data[tuple(cell)][0] + cell_data[tuple(cell)][1] + parse_multi_cells(cell)
     health_param = calculate_health_parameter(cell)
     overall_fitness *= health_param
 
@@ -131,12 +142,25 @@ def updateDicts(cell_parent, mutated : bool, cell_child = None, type = None, hea
     if(cell_child):
         if(not mutated):
             cell_data[tuple(cell_child)] = cell_data[tuple(cell_parent)]
+            try:
+                lst = multi_cells[tuple(cell_parent)]
+                lst.append(cell_data[tuple(cell_child)])
+            except Exception:
+                pass
             update_coordinates(cell_parent, cell_child)
         else:
             cell_data[tuple(cell_child)] = cell_data[tuple(cell_parent)]
             cell_coordinates[tuple(cell_child)] = cell_coordinates[tuple(cell_parent)]
+            try:
+                multi_cells[tuple(cell_child)] = multi_cells[tuple(cell_parent)]
+            except Exception:
+                pass
             if(cell_child != cell_parent):
                 cell_coordinates.pop(tuple(cell_parent))
+                try:
+                    multi_cells.pop(tuple(cell_parent))
+                except Exception:
+                    pass
                 population.pop(population.index(cell_parent))
                 cell_data.pop(tuple(cell_parent))
                 
@@ -173,6 +197,7 @@ def initialize_population(pop_size):
         y = random.randint(0, __COLS)
         cell_coordinates[tuple(genome)] = (x, y)
         cell_data[tuple(genome)] = [base_hp, base_energy, 1] # 0 - количество здоровья, 1 - количество энергии, 2 - тип клетки (всего их пока 5. 0 - стебли соединения, 1 - основа, 2 - лист, 3 - корень, 4 - антенна, 5 - семя)
+        multi_cells[tuple(genome)] = [cell_data[tuple(genome)]]
         population.append(genome)
     return population
 
@@ -186,6 +211,7 @@ def create_cell(base_cell):
         copy[index_to_change] = new_value
         new_cell = base_cell[:4] + copy[4:]
         updateDicts(base_cell, False, new_cell, type)
+
     '''elif(cell_data[tuple(base_cell)][1] >= 50 and type == 5):
         cell_data[tuple(base_cell)][1] -= 50
         new_cell = base_cell

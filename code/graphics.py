@@ -58,9 +58,9 @@ while running:
         data = evolution.cells_data()
         for cell in coords:
             if(data[tuple(cell)][2] == 1):
-                draw_filled_circle(coords[cell][0], coords[cell][1], 5, (0,255,255))
+                draw_filled_circle(coords[cell][0], coords[cell][1], 5, (0,100,50))
             elif(data[tuple(cell)][2] == 2):
-                draw_filled_circle(coords[cell][0], coords[cell][1], 5, (120,100,10))
+                draw_filled_circle(coords[cell][0], coords[cell][1], 5, (0,255,0))
             elif(data[tuple(cell)][2] == 3):
                 draw_filled_circle(coords[cell][0], coords[cell][1], 5, (102,51,0))
             elif(data[tuple(cell)][2] == 4):
