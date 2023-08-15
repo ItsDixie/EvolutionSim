@@ -94,19 +94,27 @@ def calculate_health_parameter(cell):
     print('keepalive')
     alive_x = int(cell_coordinates[tuple(cell)][0])
     alive_y = int(cell_coordinates[tuple(cell)][1])
+    type = int(cell_data[tuple(cell)][2])
+    organics = __PARAMS[(alive_x, alive_y)][0]
+    energy = __PARAMS[(alive_x, alive_y)][1]
     if(alive_x == __ROWS or alive_y == __COLS):
         if(cell_data[tuple(cell)][0] > 0): cell_data[tuple(cell)][0] = 0
         check_hp_cells()
         return -2
-    elif (__PARAMS[(alive_x, alive_y)][0] <= 40 and __PARAMS[(alive_x, alive_y)][1] <= 30):
+    elif (organics <= 40 and energy <= 30):
         if(cell_data[tuple(cell)][0] != 100): cell_data[tuple(cell)][0] += 5
         if(cell_data[tuple(cell)][1] != 100): cell_data[tuple(cell)][1] += 10
-        return 2
+        return 1
     else:
-        if(cell_data[tuple(cell)][0] > 0): 
-            cell_data[tuple(cell)][0] -= 10
-        if(cell_data[tuple(cell)][1] > 0): 
-            cell_data[tuple(cell)][1] -= 20
+        if(organics >= 40 and energy <= 30 and type == 3):
+            if(cell_data[tuple(cell)][1] != 100): cell_data[tuple(cell)][1] += 10
+            return 2
+        elif(energy >= 30 and organics <= 40  and type == 4):
+            if(cell_data[tuple(cell)][1] != 100): cell_data[tuple(cell)][1] += 10
+            return 2
+        
+        cell_data[tuple(cell)][0] -= 10
+        cell_data[tuple(cell)][1] -= 20
         return -1
 
 def updateDicts(cell_parent, mutated : bool, cell_child = None, type = None, health = None, energy = None):
