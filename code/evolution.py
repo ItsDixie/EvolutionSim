@@ -5,7 +5,7 @@ mutation_rate = 1
 genome_length = 9
 priority_length = 5
 cell_type_length = 4
-population_size = 20
+population_size = 50
 
 cell_coordinates = {}
 cell_data = {}
@@ -109,6 +109,36 @@ def calculate_health_parameter(cell):
             cell_data[tuple(cell)][1] -= 20
         return -1
 
+def updateDicts(cell_parent, mutated : bool, cell_child = None, type = None, health = None, energy = None):
+    print('keepalive')
+    if(cell_child):
+        if(not mutated):
+            cell_data[tuple(cell_child)] = cell_data[tuple(cell_parent)]
+            update_coordinates(cell_parent, cell_child)
+        else:
+            cell_data[tuple(cell_child)] = cell_data[tuple(cell_parent)]
+            cell_coordinates[tuple(cell_child)] = cell_coordinates[tuple(cell_parent)]
+            if(cell_child != cell_parent):
+                cell_coordinates.pop(tuple(cell_parent))
+                population.pop(population.index(cell_parent))
+                cell_data.pop(tuple(cell_parent))
+                
+
+        if(cell_child not in population):
+                population.append(cell_child)
+
+        if(type):
+            cell_data[tuple(cell_child)][2] = type    
+    else:
+        if(type):
+            cell_data[tuple(cell_parent)][2] = type
+        elif(health):
+            cell_data[tuple(cell_parent)][0] = health
+        elif(energy):
+            cell_data[tuple(cell_parent)][1] = energy
+    #sleep(0.2)
+
+
 def check_hp_cells():
     print('keepalive')
     for cell in population:
@@ -133,69 +163,34 @@ def create_cell(base_cell):
     if(cell_data[tuple(base_cell)][1] >= 10 and cell_data[tuple(base_cell)][2] == 1):
         cell_data[tuple(base_cell)][1] -= 10
         type = max(base_cell[5:])
-        new_cell = base_cell[:5] + [random.randint(0, 4) for _ in range(cell_type_length)]
-        population.append(new_cell)
-        cell_data.update({tuple(new_cell) : cell_data[tuple(base_cell)]})
-        cell_data[tuple(new_cell)][2] = type
-        sleep(0.2)
-        update_coordinates(base_cell, new_cell)
+        copy = base_cell.copy()
+        index_to_change = random.randint(4, len(base_cell) - 1)
+        new_value = random.randint(0, 4)
+        copy[index_to_change] = new_value
+        new_cell = base_cell[:5] + copy[5:]
+        updateDicts(base_cell, False, new_cell, type)
+        
 
 def mutate(genome):
     print('keepalive')
     mutated_genome = genome.copy()
-    for i in range(priority_length, priority_length + 4):
-        mutated_genome[i] = random.randint(0, 9)
-    cell_coordinates.update({tuple(mutated_genome) : cell_coordinates[tuple(genome)]})
-    cell_data.update({tuple(mutated_genome) : cell_data[tuple(genome)]})
-    cell_data.pop(tuple(genome))
-    cell_coordinates.pop(tuple(genome), None)
-    sleep(0.2)
+    index_to_change = random.randint(0, len(mutated_genome) - 1)
+    new_value = random.randint(0, 9) if index_to_change <= 4 else random.randint(0, 4)
+    mutated_genome[index_to_change] = new_value
+    updateDicts(genome, True, mutated_genome)
     return mutated_genome
-
-def crossover(parent1, parent2):
-    print('keepalive')
-    crossover_point = random.randint(1, genome_length - 1)
-    child1 = parent1[:crossover_point] + parent2[crossover_point:]
-    child2 = parent2[:crossover_point] + parent1[crossover_point:]
-    cell_coordinates[tuple(child1)] = cell_coordinates[tuple(parent1)]
-    cell_coordinates[tuple(child2)] = cell_coordinates[tuple(parent2)]
-    cell_coordinates.pop(tuple(parent1), None)
-    cell_coordinates.pop(tuple(parent2), None)
-    return child1, child2
-
-
-def select_parents(population, num_parents):
-    print('keepalive')
-    parents = []
-    fitness_scores = [fitness_function(cell) for cell in population]
-    total_fitness = sum(fitness_scores)
-    probabilities = [score / total_fitness for score in fitness_scores]
-    for _ in range(num_parents):
-        selected_index = random.choices(range(len(population)), probabilities)[0]
-        parents.append(population[selected_index])
-    return parents
 
 def genetic_algorithm():
     print('keepalive')
     global population
     population = initialize_population(population_size)
-    best_genome = None
     best_fitness = float('-inf')
     while True:
 
         if(random.random() < mutation_rate):
             rng = random.randint(0, len(population)-1)
-            mutated = mutate(population[rng])
-            population.append(mutated)
-            population.pop(rng)
-        '''    
-        p1,p2 = select_parents(population, 2)           # fix keyerror bug
-        child1, child2 = crossover(p1, p2)
-        population.append(child1)
-        population.append(child2)
-        population.pop(population.index(p1))
-        population.pop(population.index(p2))'''
-
+            mutate(population[rng])
+            
         check_hp_cells()
         fitness_scores = [fitness_function(cell) for cell in population]
         best_fit_indices = sorted(range(len(population)), key=lambda i: fitness_scores[i], reverse=True)[:2]
