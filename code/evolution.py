@@ -27,7 +27,7 @@ def cells_data():
 ########################
 def update_coordinates(parent_cell, child_cell):
     try:
-        print('keepalive')
+        #print('keepalive')
         x, y = cell_coordinates[tuple(parent_cell)]
         best_prioritet = max(parent_cell[:4])
         index = parent_cell.index(best_prioritet)
@@ -97,7 +97,7 @@ def parse_multi_cells(target_cell):
     return total_cell_hp
 
 def fitness_function(cell):
-    print('keepalive')
+    #print('keepalive')
     create_cell(cell)
     overall_fitness = cell_data[tuple(cell)][0] + cell_data[tuple(cell)][1] + parse_multi_cells(cell)
     health_param = calculate_health_parameter(cell)
@@ -107,15 +107,13 @@ def fitness_function(cell):
     return overall_fitness
 
 def calculate_health_parameter(cell):
-    print('keepalive')
+    #print('keepalive')
     alive_x = int(cell_coordinates[tuple(cell)][0])
     alive_y = int(cell_coordinates[tuple(cell)][1])
     type = int(cell_data[tuple(cell)][2])
     organics = __PARAMS[(alive_x, alive_y)][0]
     energy = __PARAMS[(alive_x, alive_y)][1]
     if(alive_x == __ROWS or alive_y == __COLS):
-        if(cell_data[tuple(cell)][0] > 0): cell_data[tuple(cell)][0] = 0
-        check_hp_cells()
         return -2
     elif (organics <= 40 and energy <= 30):
         if(cell_data[tuple(cell)][0] != 100): cell_data[tuple(cell)][0] += 5
@@ -138,7 +136,7 @@ def calculate_health_parameter(cell):
         return -1
 
 def updateDicts(cell_parent, mutated : bool, cell_child = None, type = None, health = None, energy = None):
-    print('keepalive')
+    #print('keepalive')
     if(cell_child):
         if(not mutated):
             cell_data[tuple(cell_child)] = cell_data[tuple(cell_parent)]
@@ -181,15 +179,17 @@ def updateDicts(cell_parent, mutated : bool, cell_child = None, type = None, hea
 
 
 def check_hp_cells():
-    print('keepalive')
+    #print('keepalive')
     for cell in population:
         if (cell_data[tuple(cell)][0] <= 0):
             cell_data.pop(tuple(cell))
             cell_coordinates.pop(tuple(cell))
             population.pop(population.index(cell))
+        elif (cell_data[tuple(cell)][0] <= 0):
+            cell_data[tuple(cell)][0] -= 10
 
 def initialize_population(pop_size):
-    print('keepalive')
+    #print('keepalive')
     population = []
     for _ in range(pop_size):
         genome = [random.randint(0, 9) for _ in range(priority_length)] + [random.randint(0, 5) for _ in range(cell_type_length)]
@@ -219,7 +219,7 @@ def create_cell(base_cell):
         
 
 def mutate(genome):
-    print('keepalive')
+    #print('keepalive')
     mutated_genome = genome.copy()
     index_to_change = random.randint(0, len(mutated_genome) - 1)
     new_value = random.randint(0, 9) if index_to_change <= 4 else random.randint(0, 5)
@@ -228,7 +228,7 @@ def mutate(genome):
     return mutated_genome
 
 def genetic_algorithm():
-    print('keepalive')
+    #print('keepalive')
     global population
     population = initialize_population(population_size)
     best_fitness = float('-inf')
